@@ -1,10 +1,14 @@
 import pydicom
 from PIL import Image
 import numpy as np
+<<<<<<< HEAD
 import cv2
 from Crypto.Cipher import AES
 from Crypto.Util.Padding import pad, unpad
 import os
+=======
+
+>>>>>>> cb11ce635ab6b9caf89edb8f8b8c5a060ba71fcb
 
 def load_dicom_image(dicom_path, slice_index=48):
     dicom_image = pydicom.dcmread(dicom_path)
@@ -28,6 +32,7 @@ def preprocess_image(image):
     return resized_image
 
 
+<<<<<<< HEAD
 # def encode_lsb(image_path, data, output_path='encoded_image.png'):
 #     image = Image.open(image_path)
 #     image_array = np.array(image)
@@ -54,6 +59,9 @@ def preprocess_image(image):
 
 # PVD embedding function
 def embed_pvd(image_path, data, output_image='pvd_encoded_image.png'):
+=======
+def encode_lsb(image_path, data, output_path='encoded_image.png'):
+>>>>>>> cb11ce635ab6b9caf89edb8f8b8c5a060ba71fcb
     image = Image.open(image_path)
     image_array = np.array(image)
 
@@ -61,6 +69,7 @@ def embed_pvd(image_path, data, output_image='pvd_encoded_image.png'):
     data_index = 0
     data_len = len(binary_data)
 
+<<<<<<< HEAD
     for i in range(0, image_array.shape[0] - 1, 2): 
         for j in range(0, image_array.shape[1], 1):
             if data_index < data_len:
@@ -231,6 +240,22 @@ def save_dicom_image(decoded_image_path, output_dicom_path):
     print(f"DICOM image saved as {output_dicom_path}")
 
 
+=======
+    for row in range(image_array.shape[0]):
+        for col in range(image_array.shape[1]):
+            for color in range(3):  
+                if data_index < data_len:
+                    
+                    pixel_bin = format(image_array[row, col, color], '08b')
+
+                    pixel_bin = pixel_bin[:-1] + binary_data[data_index]
+                    image_array[row, col, color] = int(pixel_bin, 2)
+                    data_index += 1
+
+    encoded_image = Image.fromarray(image_array)
+    encoded_image.save(output_path)
+    print(f"Data encoded successfully into {output_path}")
+>>>>>>> cb11ce635ab6b9caf89edb8f8b8c5a060ba71fcb
 
 
 if __name__ == "__main__":
@@ -241,13 +266,19 @@ if __name__ == "__main__":
     preprocessed_image.save('preprocessed_medical_image.png')
 
     cover_image_path = 'D:\\college work\\Steganography in Medical Images\\public\\image\\32819.jpg'
+<<<<<<< HEAD
     output_image_path1 = 'encoded_image.png'
 
     
+=======
+    output_image_path = 'encoded_image.png'
+
+>>>>>>> cb11ce635ab6b9caf89edb8f8b8c5a060ba71fcb
     with open('preprocessed_medical_image.png', 'rb') as f:
         medical_image_data = f.read()
     binary_data = ''.join(format(byte, '08b') for byte in medical_image_data)
 
+<<<<<<< HEAD
     # encode_lsb(cover_image_path, binary_data, output_image_path1)
     embed_pvd(cover_image_path, binary_data, output_image_path1)
 
@@ -269,3 +300,6 @@ if __name__ == "__main__":
 
     final_dicom_path = 'recovered_medical_image.dcm'
     save_dicom_image(output_dicom_image_path, final_dicom_path)
+=======
+    encode_lsb(cover_image_path, binary_data, output_image_path)
+>>>>>>> cb11ce635ab6b9caf89edb8f8b8c5a060ba71fcb
