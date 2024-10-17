@@ -32,7 +32,7 @@ def preprocess_image(image):
     return resized_image
 
 
-<<<<<<< HEAD
+# <<<<<<< HEAD
 # def encode_lsb(image_path, data, output_path='encoded_image.png'):
 #     image = Image.open(image_path)
 #     image_array = np.array(image)
