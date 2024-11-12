@@ -1,14 +1,11 @@
 import pydicom
 from PIL import Image
 import numpy as np
-<<<<<<< HEAD
 import cv2
 from Crypto.Cipher import AES
 from Crypto.Util.Padding import pad, unpad
 import os
-=======
-
->>>>>>> cb11ce635ab6b9caf89edb8f8b8c5a060ba71fcb
+import pywt
 
 def load_dicom_image(dicom_path, slice_index=48):
     dicom_image = pydicom.dcmread(dicom_path)
@@ -32,7 +29,6 @@ def preprocess_image(image):
     return resized_image
 
 
-# <<<<<<< HEAD
 # def encode_lsb(image_path, data, output_path='encoded_image.png'):
 #     image = Image.open(image_path)
 #     image_array = np.array(image)
@@ -57,72 +53,128 @@ def preprocess_image(image):
 #     print(f"Data encoded successfully")
 
 
-# PVD embedding function
-def embed_pvd(image_path, data, output_image='pvd_encoded_image.png'):
-=======
-def encode_lsb(image_path, data, output_path='encoded_image.png'):
->>>>>>> cb11ce635ab6b9caf89edb8f8b8c5a060ba71fcb
-    image = Image.open(image_path)
-    image_array = np.array(image)
+# # PVD embedding function
+# def embed_pvd(image_path, data, output_image='pvd_encoded_image.png'):
+#     image = Image.open(image_path)
+#     image_array = np.array(image)
 
-    binary_data = ''.join(format(ord(char), '08b') for char in data)
-    data_index = 0
-    data_len = len(binary_data)
+#     binary_data = ''.join(format(ord(char), '08b') for char in data)
+#     data_index = 0
+#     data_len = len(binary_data)
 
-<<<<<<< HEAD
-    for i in range(0, image_array.shape[0] - 1, 2): 
-        for j in range(0, image_array.shape[1], 1):
-            if data_index < data_len:
-                for channel in range(3):  # For R, G, B channels
-                    p1 = int(image_array[i, j, channel])
-                    p2 = int(image_array[i+1, j, channel])
+#     for i in range(0, image_array.shape[0] - 1, 2): 
+#         for j in range(0, image_array.shape[1], 1):
+#             if data_index < data_len:
+#                 for channel in range(3):  # For R, G, B channels
+#                     p1 = int(image_array[i, j, channel])
+#                     p2 = int(image_array[i+1, j, channel])
                     
-                    diff = abs(p1 - p2)
-                    bits_to_embed = len(bin(diff)[2:])  # Number of bits to embed based on the difference
+#                     diff = abs(p1 - p2)
+#                     bits_to_embed = len(bin(diff)[2:])  # Number of bits to embed based on the difference
                     
-                    if data_index + bits_to_embed <= data_len:
-                        secret_bits = binary_data[data_index:data_index + bits_to_embed]
-                        secret_value = int(secret_bits, 2)
+#                     if data_index + bits_to_embed <= data_len:
+#                         secret_bits = binary_data[data_index:data_index + bits_to_embed]
+#                         secret_value = int(secret_bits, 2)
                         
-                        new_diff = secret_value
-                        if p1 > p2:
-                            p1 = p2 + new_diff
-                        else:
-                            p2 = p1 + new_diff
+#                         new_diff = secret_value
+#                         if p1 > p2:
+#                             p1 = p2 + new_diff
+#                         else:
+#                             p2 = p1 + new_diff
                         
-                        # Clamp the pixel values to stay within [0, 255]
-                        p1 = max(0, min(255, p1))
-                        p2 = max(0, min(255, p2))
+#                         # Clamp the pixel values to stay within [0, 255]
+#                         p1 = max(0, min(255, p1))
+#                         p2 = max(0, min(255, p2))
                         
-                        image_array[i, j, channel] = p1
-                        image_array[i+1, j, channel] = p2
+#                         image_array[i, j, channel] = p1
+#                         image_array[i+1, j, channel] = p2
 
-                        data_index += bits_to_embed
+#                         data_index += bits_to_embed
 
-    encoded_image = Image.fromarray(image_array)
-    encoded_image.save(output_image)
-    print(f"Data embedded successfully in {output_image}")
+#     encoded_image = Image.fromarray(image_array)
+#     encoded_image.save(output_image)
+#     print(f"Data embedded successfully in {output_image}")
 
-# PVD extraction function
-def extract_pvd(image_path, data_length):
-    image = Image.open(image_path)
-    image_array = np.array(image)
+# # PVD extraction function
+# def extract_pvd(image_path, data_length):
+#     image = Image.open(image_path)
+#     image_array = np.array(image)
 
-    extracted_bits = ''
+#     extracted_bits = ''
 
-    for i in range(0, image_array.shape[0] - 1, 2): 
-        for j in range(0, image_array.shape[1], 1):
-            if len(extracted_bits) < data_length * 8:
-                p1 = int(image_array[i, j])
-                p2 = int(image_array[i+1, j])
+#     for i in range(0, image_array.shape[0] - 1, 2): 
+#         for j in range(0, image_array.shape[1], 1):
+#             if len(extracted_bits) < data_length * 8:
+#                 p1 = int(image_array[i, j])
+#                 p2 = int(image_array[i+1, j])
                 
-                diff = abs(p1 - p2)
-                extracted_bits += format(diff, '08b')
+#                 diff = abs(p1 - p2)
+#                 extracted_bits += format(diff, '08b')
 
-    all_bytes = [extracted_bits[i:i+8] for i in range(0, len(extracted_bits), 8)]
-    decoded_message = ''.join([chr(int(byte, 2)) for byte in all_bytes])
+#     all_bytes = [extracted_bits[i:i+8] for i in range(0, len(extracted_bits), 8)]
+#     decoded_message = ''.join([chr(int(byte, 2)) for byte in all_bytes])
 
-    print(f"Extracted message: {decoded_message}")
+#     print(f"Extracted message: {decoded_message}")
+
+# Embedding Function
+def embed_secret(cover_image_path, secret_image_path, output_path, alpha=0.01):
+    cover_image = cv2.imread(cover_image_path, cv2.IMREAD_GRAYSCALE)
+    secret_image = cv2.imread(secret_image_path, cv2.IMREAD_GRAYSCALE)
+
+    # Ensure the secret image is resized to match half the dimensions of the cover image
+    secret_image = cv2.resize(secret_image, (cover_image.shape[1] // 2, cover_image.shape[0] // 2))
+
+    coeffs2 = pywt.dwt2(cover_image, 'haar')
+    LL, (LH, HL, HH) = coeffs2
+
+    # Resize or crop the secret image if needed to match the DWT sub-bands
+    secret_image = cv2.resize(secret_image, (LH.shape[1], LH.shape[0]))
+
+    # Embed the secret image into the DWT sub-bands
+    LH_embedded = LH + (alpha * secret_image)
+    HL_embedded = HL + (alpha * secret_image)
+    HH_embedded = HH + (alpha * secret_image)
+
+    stego_coeffs = (LL, (LH_embedded, HL_embedded, HH_embedded))
+    stego_image = pywt.idwt2(stego_coeffs, 'haar')
+    stego_image = np.clip(stego_image, 0, 255).astype(np.uint8)
+
+    cv2.imwrite(output_path, stego_image)
+    print(f"Stego image saved as {output_path}")
+
+
+def extract_secret(stego_image_path, cover_image_path, alpha=0.01):
+    # Check if both files exist
+    if not os.path.exists(stego_image_path):
+        raise FileNotFoundError(f"Stego image not found at {stego_image_path}")
+    if not os.path.exists(cover_image_path):
+        raise FileNotFoundError(f"Cover image not found at {cover_image_path}")
+
+    # Load images
+    stego_image = cv2.imread(stego_image_path, cv2.IMREAD_GRAYSCALE)
+    cover_image = cv2.imread(cover_image_path, cv2.IMREAD_GRAYSCALE)
+
+    # Verify that images loaded correctly and are in grayscale (2D arrays)
+    if stego_image is None:
+        raise ValueError("Failed to load stego image. Check the file path or format.")
+    if cover_image is None:
+        raise ValueError("Failed to load cover image. Check the file path or format.")
+    if stego_image.ndim != 2 or cover_image.ndim != 2:
+        raise ValueError("Both images must be 2D grayscale arrays for DWT processing.")
+
+    # Perform DWT
+    coeffs2_stego = pywt.dwt2(stego_image, 'haar')
+    coeffs2_cover = pywt.dwt2(cover_image, 'haar')
+    _, (LH_stego, HL_stego, HH_stego) = coeffs2_stego
+    _, (LH_cover, HL_cover, HH_cover) = coeffs2_cover
+
+    extracted_secret = (LH_stego - LH_cover + HL_stego - HL_cover + HH_stego - HH_cover) / (3 * alpha)
+    extracted_secret = np.clip(extracted_secret, 0, 255).astype(np.uint8)
+
+    cv2.imshow('Extracted Secret Image', extracted_secret)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+
 
 def apply_dct_watermarking(image_path, watermark_text):
     image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
@@ -201,33 +253,33 @@ def extract_dct_watermark(image_path, watermark_length):
 
 
 
-def decode_lsb(image_path, output_dicom_path):
-    image = Image.open(image_path)
-    image_array = np.array(image)
+# def decode_lsb(image_path, output_dicom_path):
+#     image = Image.open(image_path)
+#     image_array = np.array(image)
     
-    if len(image_array.shape) == 2:  
-        is_rgb = False
-    else:  # RGB
-        is_rgb = True
+#     if len(image_array.shape) == 2:  
+#         is_rgb = False
+#     else:  # RGB
+#         is_rgb = True
 
-    binary_data = ''
+#     binary_data = ''
     
-    for row in range(image_array.shape[0]):
-        for col in range(image_array.shape[1]):
-            if is_rgb:
-                for color in range(3):  
-                    pixel_bin = format(image_array[row, col, color], '08b')
-                    binary_data += pixel_bin[-1]  
-            else:
-                pixel_bin = format(image_array[row, col], '08b')
-                binary_data += pixel_bin[-1]  
+#     for row in range(image_array.shape[0]):
+#         for col in range(image_array.shape[1]):
+#             if is_rgb:
+#                 for color in range(3):  
+#                     pixel_bin = format(image_array[row, col, color], '08b')
+#                     binary_data += pixel_bin[-1]  
+#             else:
+#                 pixel_bin = format(image_array[row, col], '08b')
+#                 binary_data += pixel_bin[-1]  
 
-    all_bytes = [binary_data[i:i+8] for i in range(0, len(binary_data), 8)]
-    decoded_data = bytearray([int(byte, 2) for byte in all_bytes])
+#     all_bytes = [binary_data[i:i+8] for i in range(0, len(binary_data), 8)]
+#     decoded_data = bytearray([int(byte, 2) for byte in all_bytes])
 
-    with open(output_dicom_path, 'wb') as f:
-        f.write(decoded_data)
-    print(f"Data decoded and saved as {output_dicom_path}")
+#     with open(output_dicom_path, 'wb') as f:
+#         f.write(decoded_data)
+#     print(f"Data decoded and saved as {output_dicom_path}")
 
 
 
@@ -240,22 +292,6 @@ def save_dicom_image(decoded_image_path, output_dicom_path):
     print(f"DICOM image saved as {output_dicom_path}")
 
 
-=======
-    for row in range(image_array.shape[0]):
-        for col in range(image_array.shape[1]):
-            for color in range(3):  
-                if data_index < data_len:
-                    
-                    pixel_bin = format(image_array[row, col, color], '08b')
-
-                    pixel_bin = pixel_bin[:-1] + binary_data[data_index]
-                    image_array[row, col, color] = int(pixel_bin, 2)
-                    data_index += 1
-
-    encoded_image = Image.fromarray(image_array)
-    encoded_image.save(output_path)
-    print(f"Data encoded successfully into {output_path}")
->>>>>>> cb11ce635ab6b9caf89edb8f8b8c5a060ba71fcb
 
 
 if __name__ == "__main__":
@@ -266,21 +302,16 @@ if __name__ == "__main__":
     preprocessed_image.save('preprocessed_medical_image.png')
 
     cover_image_path = 'D:\\college work\\Steganography in Medical Images\\public\\image\\32819.jpg'
-<<<<<<< HEAD
     output_image_path1 = 'encoded_image.png'
 
     
-=======
-    output_image_path = 'encoded_image.png'
-
->>>>>>> cb11ce635ab6b9caf89edb8f8b8c5a060ba71fcb
     with open('preprocessed_medical_image.png', 'rb') as f:
         medical_image_data = f.read()
     binary_data = ''.join(format(byte, '08b') for byte in medical_image_data)
 
-<<<<<<< HEAD
     # encode_lsb(cover_image_path, binary_data, output_image_path1)
-    embed_pvd(cover_image_path, binary_data, output_image_path1)
+    # embed_pvd(cover_image_path, binary_data, output_image_path1)
+    embed_secret(cover_image_path, 'preprocessed_medical_image.png', output_image_path1)
 
     watermark_text = "Confidential"
     apply_dct_watermarking(output_image_path1, watermark_text)
@@ -296,10 +327,8 @@ if __name__ == "__main__":
     extracted_watermark = extract_dct_watermark(decrypted_image_path, watermark_length=len("Confidential"))
 
     output_dicom_image_path = 'decoded_dicom_image.png'
-    decode_lsb(decrypted_image_path, output_dicom_image_path)
+    # decode_lsb(decrypted_image_path, output_dicom_image_path)
+    extract_secret(decrypted_image_path, cover_image_path)
 
     final_dicom_path = 'recovered_medical_image.dcm'
     save_dicom_image(output_dicom_image_path, final_dicom_path)
-=======
-    encode_lsb(cover_image_path, binary_data, output_image_path)
->>>>>>> cb11ce635ab6b9caf89edb8f8b8c5a060ba71fcb
