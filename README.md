@@ -36,5 +36,5 @@ This project explores steganographic techniques for embedding hidden data within
 
 3. Ensure the required libraries are included in the build path.
 
-4. Run the main application file to launch the GUI.
+4. Run the main application.
 
