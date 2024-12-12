@@ -29,9 +29,9 @@ This project explores steganographic techniques for embedding hidden data within
 ## Installation
 
 1. Clone the repository:
-
-`git clone https://github.com/shreyakushw/steganography-medical-images.git`
-
+  ```sh
+    git clone https://github.com/shreyakushw/steganography-medical-images.git
+  ```
 2. Open the project in Visual Studio.
 
 3. Ensure the required libraries are included in the build path.
