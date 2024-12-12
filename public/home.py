@@ -121,16 +121,12 @@ def embed_secret(cover_image_path, secret_image_path, output_path, alpha=0.01):
     cover_image = cv2.imread(cover_image_path, cv2.IMREAD_GRAYSCALE)
     secret_image = cv2.imread(secret_image_path, cv2.IMREAD_GRAYSCALE)
 
-    # Ensure the secret image is resized to match half the dimensions of the cover image
     secret_image = cv2.resize(secret_image, (cover_image.shape[1] // 2, cover_image.shape[0] // 2))
 
     coeffs2 = pywt.dwt2(cover_image, 'haar')
     LL, (LH, HL, HH) = coeffs2
-
-    # Resize or crop the secret image if needed to match the DWT sub-bands
     secret_image = cv2.resize(secret_image, (LH.shape[1], LH.shape[0]))
 
-    # Embed the secret image into the DWT sub-bands
     LH_embedded = LH + (alpha * secret_image)
     HL_embedded = HL + (alpha * secret_image)
     HH_embedded = HH + (alpha * secret_image)
@@ -144,17 +140,14 @@ def embed_secret(cover_image_path, secret_image_path, output_path, alpha=0.01):
 
 
 def extract_secret(stego_image_path, cover_image_path, alpha=0.01):
-    # Check if both files exist
     if not os.path.exists(stego_image_path):
         raise FileNotFoundError(f"Stego image not found at {stego_image_path}")
     if not os.path.exists(cover_image_path):
         raise FileNotFoundError(f"Cover image not found at {cover_image_path}")
 
-    # Load images
     stego_image = cv2.imread(stego_image_path, cv2.IMREAD_GRAYSCALE)
     cover_image = cv2.imread(cover_image_path, cv2.IMREAD_GRAYSCALE)
 
-    # Verify that images loaded correctly and are in grayscale (2D arrays)
     if stego_image is None:
         raise ValueError("Failed to load stego image. Check the file path or format.")
     if cover_image is None:
